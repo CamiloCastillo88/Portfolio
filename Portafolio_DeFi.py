@@ -34,6 +34,7 @@ class Portfolio:
         if not np.isclose(w.sum(), 1.0):
             raise ValueError("Los pesos deben sumar 1.")
             # Asignar capital inicial por activo según pesos
+        else:
             alloc = self.V0 * w
             # Número de acciones por activo al inicio
             first_prices = self.precios.iloc[0].values
@@ -48,3 +49,6 @@ class Portfolio:
      
      
 aux = Portfolio(['AAPL','KO','CX'], np.array([0.5,0.2,0.3]))
+
+aux.portfolio_value()
+

@@ -14,7 +14,7 @@ from typing import List, Tuple, Dict, Optional
 
 
 class yahoo_data:
-    "Esta clase descarga la informaci{on de cierre de una lista de tickers"
+    "Esta clase descarga la información de cierre para una lista de tickers"
     def __init__(self,tickers:List[str], start: str='2021-01-01', end: Optional[str]=None) -> pd.DataFrame:
         self.tickers = tickers
         self.start = start
