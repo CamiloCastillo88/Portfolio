@@ -17,7 +17,7 @@ class Do_portfolio:
         self.tickers = tickers
         self.start = start
         self.end = end
-        self.weights = None
+        self.weights = [0]*len(self.tickers)
         self.info = yahoo_data.yahoo_data(tickers=self.tickers,
                                           start=self.start,
                                           end = self.end)
@@ -34,7 +34,7 @@ class Do_portfolio:
     
     def Monte_Carlo(self, n_port: int, short: bool = True, seed: Optional[int] = None, rf: float = 0.01, periods_per_year: int = 252):
         "Construye un portafolio por Monte Carlos con el Max. Sharpe"
-        W = self.random_weights(len(self.weights),n_port,short = short,seed = seed)
+        W = self.random_weights(n_port,short = short,seed = seed)
         results = np.zeros((n_port,4))
         for i in range(n_port):
             m = metrics_portfolio.annualize_stats(self.info.compute_returns(), W[i], rf= rf, periods_per_year=periods_per_year)
@@ -47,5 +47,20 @@ class Do_portfolio:
         
         for j, t in enumerate(self.tickers):
             df[f'w_{t}'] = W[:,j]
-            
+        return df
+    
+    def pick_candidates(self, n_port: int, short: bool = True, rf: float= 0.01, seed: Optional[int]= None, periods_per_year: int = 252) -> Dict[str, pd.Series]:
+        "Retorna el portafolios candidatos: max_sharpe, min vol"
+        aux = self.Monte_Carlo(n_port,short = short, seed = seed, rf = rf, periods_per_year= periods_per_year)
+        idx_sharpe = aux['Sharpe'].idxmax()
+        idx_minvol = aux['ann_vol'].idxmin()
+        return {
+            'max Sharpe': aux.loc[idx_sharpe],
+            'min Vol': aux.loc[idx_minvol]
+            }
+        
+### Example ###
+porta = Do_portfolio(['AAPL','CX','KO'])
+porta.pick_candidates(n_port = 1000)
+
         

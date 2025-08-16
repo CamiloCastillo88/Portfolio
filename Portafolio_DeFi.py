@@ -71,7 +71,6 @@ class Portfolio:
         print("***Metrics***")
         if ret == True:
             return aux
-        
     
     def __str__(self):
         return (
