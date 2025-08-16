@@ -9,8 +9,7 @@ Created on Wed Aug 13 18:28:03 2025
 import numpy as np
 import pandas as pd
 import yfinance as yf
-from dataclasses import dataclass
-from typing import List, Tuple, Dict, Optional
+from typing import List, Optional
 
 
 class yahoo_data:

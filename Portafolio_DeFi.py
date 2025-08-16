@@ -10,6 +10,10 @@ import numpy as np
 import pandas as pd
 import yahoo_data
 from typing import List, Tuple, Dict, Optional
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+from plotly.offline import plot
+import metrics_portfolio
 
 class Portfolio:
     "Partiendo de un df con los precios y un portafolio construye el valor de portafolio y las metricas"
@@ -23,9 +27,10 @@ class Portfolio:
         self.rets = self._info.compute_returns('simple')
         self.weights = weights
         self.V0 = initial_capital
-        self.Value_portfolio = pd.DataFrame()
+        self.Value_portfolio = self._portfolio_value()
+        self.metrics_port = None
         
-    def portfolio_value(self) -> pd.DataFrame:
+    def _portfolio_value(self) -> pd.DataFrame:
         """
         Construye un DataFrame con la serie temporal del valor del portafolio.
         Usa pesos fijos y buy&hold sin rebalanceo continuo (rebalanceo solo al inicio).
@@ -41,14 +46,48 @@ class Portfolio:
             shares = alloc / first_prices
             # Valor en el tiempo
             port_val = self.precios.values @ shares
-            self.Value_portfolio = pd.DataFrame(port_val, index=self.precios.index, columns=["PortfolioValue"])
+            port_val = pd.DataFrame(port_val, index=self.precios.index, columns=["PortfolioValue"])
         print("Valor del portafolio creado")
+        return port_val
         
-    #def plot_value_portfolio(self):
-     ## Ejercicio: crear un metodo que construya la grafica de el valor del portafolio
-     
-     
-aux = Portfolio(['AAPL','KO','CX'], np.array([0.5,0.2,0.3]))
+    def plot_value_portfolio(self):
+        "Construye la grafica del valor del portafolio"
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x = self.Value_portfolio.index,
+                                 y = self.Value_portfolio['PortfolioValue'],
+                                  mode = 'lines',
+                                  name = 'Total Position',
+                                  line = dict(color = 'black')))
+        fig.update_layout(xaxis_title = 'Time', yaxis_title = 'Total Position',
+                          title = 'Total Position')
+        plot(fig, auto_open = True)
+        
+    def metrics(self, rf: float = 0.0, periods_per_year: int = 252, ret:bool = True):
+        aux = metrics_portfolio.annualize_stats(self.log_rets,
+                                                self.weights,
+                                                rf = rf,
+                                                periods_per_year= periods_per_year)
+        self.metrics_port = aux
+        print("***Metrics***")
+        if ret == True:
+            return aux
+        
+    
+    def __str__(self):
+        return (
+            f'Annual return: {self.metrics_port.ann_return}\n'
+            f'Annual Volatility: {self.metrics_port.ann_vol}\n'
+            f'Sharpe (annual): {self.metrics_port.sharpe}\n'
+            f'Variation Coef. : {self.metrics_port.cv}')
+        
 
-aux.portfolio_value()
+#aux = Portfolio(['AAPL','KO','CX'], np.array([0.5,0.2,0.3]))
+
+#aux.plot_value_portfolio()
+
+#aux.metrics(ret=False)
+#print(aux)
+
+
+
 
