@@ -81,12 +81,29 @@ class Portfolio:
         
 
 #aux = Portfolio(['AAPL','KO','CX'], np.array([0.5,0.2,0.3]))
-
 #aux.plot_value_portfolio()
-
 #aux.metrics(ret=False)
 #print(aux)
 
+## Portfolio allocation
 
+import Methodologies_Port
 
+tickers = ['AAPL','CX','KO']
 
+portfolio1 = Methodologies_Port.Do_portfolio(tickers)
+
+## Estimations
+portfolio1.mean_estimation()
+portfolio1.var_estimation()
+
+## portfolio
+
+portfolio1.Markowitz()
+
+## Metrics over this protfolio
+
+portfolio1_metrics = Portfolio(tickers, portfolio1.weights)
+portfolio1_metrics.plot_value_portfolio()
+portfolio1_metrics.metrics(ret=False)
+print(portfolio1_metrics)

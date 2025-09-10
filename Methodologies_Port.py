@@ -114,16 +114,20 @@ class Do_portfolio:
             frontera_efici = EfficientFrontier(self.bar_mu.values, self.bar_var.values, weight_bounds=(-1,1))
             if portfolio == 'min_vol':
                 self.weights = list(frontera_efici.min_volatility().values())
-            elif portfolio == 'max_sharpe':
+            elif portfolio == ' e':
                 self.weights = list(frontera_efici.max_sharpe(risk_free_rate=rf).values())
         else:
-            frontera_efici = EfficientFrontier(self.bar_mu, self.bar_var, weight_bounds=(-1,1))
+            frontera_efici = EfficientFrontier(self.bar_mu, self.bar_var, weight_bounds=(0,1))
+            if portfolio == 'min_vol':
+                self.weights = list(frontera_efici.min_volatility().values())
+            elif portfolio == 'max_sharpe':
+                self.weights = list(frontera_efici.max_sharpe(risk_free_rate=rf).values())
         return self.weights
 
 
 ### Example ###
 tickers = ['AAPL','CX','KO']
-porta = Do_portfolio(tickers)
+porta = Do_portfolio(tickers, end='2025-01-01')
 w_MC = porta.pick_candidates(n_port = 1000)
 #for i,j in zip(w['max Sharpe'].iloc[-1:-4:-1],tickers):
 #    print(f'{j}: {i}')
@@ -132,7 +136,6 @@ w_MC = porta.pick_candidates(n_port = 1000)
 ### Markowitz 
 porta.mean_estimation()
 porta.var_estimation()
-
 w_Marko = porta.Markowitz()
     
     
